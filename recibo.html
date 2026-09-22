@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Recibo Profissional - Grátis</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f1f5f9;
+            color: #334155;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .nav-menu {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+        }
+        .nav-menu a {
+            text-decoration: none;
+            color: #0284c7;
+            font-weight: bold;
+            font-size: 14px;
+            padding: 8px 16px;
+            background: #ffffff;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+        }
+        .nav-menu a:hover {
+            background: #0284c7;
+            color: white;
+        }
+        .container {
+            width: 100%;
+            max-width: 850px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .container { grid-template-columns: 1fr; }
+        }
+        .form-box, .preview-box {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        h2 { font-size: 20px; color: #0f172a; margin-bottom: 15px; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+        input, textarea {
+            width: 100%;
+            padding: 9px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #0284c7;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.2s;
+        }
+        button:hover { background-color: #0369a1; }
+        
+        /* Estilo do Recibo Gerado */
+        .receipt-paper {
+            border: 2px dashed #94a3b8;
+            padding: 20px;
+            background: #fafafa;
+            border-radius: 6px;
+        }
+        .receipt-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #0284c7;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .receipt-title { font-size: 22px; font-weight: bold; color: #0284c7; }
+        .receipt-value { font-size: 20px; font-weight: bold; color: #15803d; }
+        .receipt-body p { font-size: 14px; line-height: 1.6; margin-bottom: 10px; }
+        .receipt-footer {
+            margin-top: 30px;
+            text-align: center;
+            border-top: 1px solid #cbd5e1;
+            padding-top: 10px;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        /* Estilo exclusivo para impressão */
+        @media print {
+            body * { visibility: hidden; }
+            #receiptPrintArea, #receiptPrintArea * { visibility: visible; }
+            #receiptPrintArea {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                border: 2px solid #000;
+            }
+            button, .nav-menu { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Menu de Navegação Superior -->
+    <div class="nav-menu">
+        <a href="index.html">← Calculadora de Precificação</a>
+    </div>
+
+    <h2 style="margin-bottom: 20px; text-align: center;">Gerador de Recibos Profissional</h2>
+
+    <div class="container">
+        <!-- FORMULÁRIO -->
+        <div class="form-box">
+            <h2>Preencha os Dados</h2>
+            <div class="form-group">
+                <label for="issuer">Quem está recebendo (Seu Nome/Empresa)</label>
+                <input type="text" id="issuer" placeholder="Ex: João da Silva Serviços" oninput="updateReceipt()">
+            </div>
+            <div class="form-group">
+                <label for="doc">Seu CPF ou CNPJ</label>
+                <input type="text" id="doc" placeholder="Ex: 000.000.000-00" oninput="updateReceipt()">
+            </div>
+            <div class="form-group">
+                <label for="client">Quem está pagando (Cliente)</label>
+                <input type="text" id="client" placeholder="Ex: Maria Oliveira" oninput="updateReceipt()">
+            </div>
+            <div class="form-group">
+                <label for="amount">Valor (R$)</label>
+                <input type="number" id="amount" placeholder="Ex: 250.00" step="0.01" oninput="updateReceipt()">
+            </div>
+            <div class="form-group">
+                <label for="description">Referente a (Serviço/Produto)</label>
+                <textarea id="description" rows="3" placeholder="Ex: Manutenção de computador e formatação." oninput="updateReceipt()"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="date">Data</label>
+                <input type="date" id="date" oninput="updateReceipt()">
+            </div>
+        </div>
+
+        <!-- PRÉ-VISUALIZAÇÃO DO RECIBO -->
+        <div class="preview-box">
+            <h2>Pré-visualização</h2>
+            <div class="receipt-paper" id="receiptPrintArea">
+                <div class="receipt-header">
+                    <span class="receipt-title">RECIBO</span>
+                    <span class="receipt-value" id="viewAmount">R$ 0,00</span>
+                </div>
+                <div class="receipt-body">
+                    <p>Recebi(emos) de <strong id="viewClient">[Nome do Cliente]</strong> a quantia de <strong id="viewAmountText">R$ 0,00</strong>.</p>
+                    <p>Referente a: <span id="viewDescription">[Descrição do Serviço]</span>.</p>
+                    <p style="margin-top: 15px;">Para maior clareza, firmo(amos) o presente recibo.</p>
+                </div>
+                <div class="receipt-footer">
+                    <p id="viewDate">Data: --/--/----</p>
+                    <br><br>
+                    <p>___________________________________________________</p>
+                    <p><strong id="viewIssuer">[Seu Nome/Empresa]</strong></p>
+                    <p id="viewDoc">CPF/CNPJ: --</p>
+                </div>
+            </div>
+            <button onclick="window.print()">Imprimir ou Salvar em PDF</button>
+        </div>
+    </div>
+
+    <script>
+        // Define data de hoje por padrão
+        document.getElementById('date').valueAsDate = new Date();
+
+        function updateReceipt() {
+            const issuer = document.getElementById('issuer').value || '[Seu Nome/Empresa]';
+            const doc = document.getElementById('doc').value || '--';
+            const client = document.getElementById('client').value || '[Nome do Cliente]';
+            const amount = parseFloat(document.getElementById('amount').value) || 0;
+            const description = document.getElementById('description').value || '[Descrição do Serviço]';
+            const dateVal = document.getElementById('date').value;
+
+            const formattedAmount = 'R$ ' + amount.toFixed(2).replace('.', ',');
+            
+            let formattedDate = '--/--/----';
+            if (dateVal) {
+                const parts = dateVal.split('-');
+                formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+
+            document.getElementById('viewIssuer').innerText = issuer;
+            document.getElementById('viewDoc').innerText = 'CPF/CNPJ: ' + doc;
+            document.getElementById('viewClient').innerText = client;
+            document.getElementById('viewAmount').innerText = formattedAmount;
+            document.getElementById('viewAmountText').innerText = formattedAmount;
+            document.getElementById('viewDescription').innerText = description;
+            document.getElementById('viewDate').innerText = 'Data: ' + formattedDate;
+        }
+
+        updateReceipt();
+    </script>
+</body>
+</html>
