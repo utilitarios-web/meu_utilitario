@@ -20,21 +20,26 @@
             margin-bottom: 20px;
             display: flex;
             gap: 15px;
+            background: #ffffff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         .nav-menu a {
             text-decoration: none;
-            color: #0284c7;
+            color: #475569;
             font-weight: bold;
             font-size: 14px;
-            padding: 8px 16px;
-            background: #ffffff;
+            padding: 8px 14px;
             border-radius: 6px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             transition: all 0.2s;
         }
+        .nav-menu a.active {
+            background-color: #e0f2fe;
+            color: #0284c7;
+        }
         .nav-menu a:hover {
-            background: #0284c7;
-            color: white;
+            color: #0284c7;
         }
         .container {
             width: 100%;
@@ -121,9 +126,10 @@
 </head>
 <body>
 
-    <!-- Menu de Navegação Superior -->
+    <!-- MENU DE NAVEGAÇÃO SUPERIOR -->
     <div class="nav-menu">
-        <a href="index.html">← Calculadora de Precificação</a>
+        <a href="index.html">📊 Calculadora</a>
+        <a href="recibo.html" class="active">📄 Gerador de Recibos</a>
     </div>
 
     <h2 style="margin-bottom: 20px; text-align: center;">Gerador de Recibos Profissional</h2>
@@ -184,7 +190,6 @@
     </div>
 
     <script>
-        // Define data de hoje por padrão
         document.getElementById('date').valueAsDate = new Date();
 
         function updateReceipt() {
